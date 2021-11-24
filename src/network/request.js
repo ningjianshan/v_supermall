@@ -18,7 +18,7 @@ import axios from 'axios'
 
 export function request(config) {
     const install = axios.create({
-        baseURL: 'http://123.207.32.32:8000',
+        baseURL: "http://152.136.185.210:7878/api/hy66",
         timeOut: 5000
     });
     //     install(config.url)
