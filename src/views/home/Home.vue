@@ -62,6 +62,7 @@ import BackTop from "components/common/backTop/BackTop.vue";
 // 导入网络请求
 import { getHomeMultidata, getHomeGoods } from "network/home";
 import { debounce } from "../../common/utils";
+import { imgListenerMixin, backTopMixin } from "../../common/mixin";
 
 export default {
   components: {
@@ -74,29 +75,27 @@ export default {
     Scroll,
     BackTop,
   },
+  mixins: [imgListenerMixin, backTopMixin],
   data() {
     return {
-      banners: [],
-      recommends: [],
+      banners: [], // 首页轮播图数据
+      recommends: [], // 分类数据
+      // 商品数据
       goods: {
         pop: { page: 0, list: [] },
         new: { page: 0, list: [] },
         sell: { page: 0, list: [] },
       },
       currenType: "pop",
-      isShowBackTop: false,
       tabOffsetTop: 0,
-      isTabFixed: false,
-      saveY: 0,
+      isTabFixed: false, // isTabFixedr吸顶效果
+      saveY: 0, // 路由切换时记录当前滚动的Y轴坐标
     };
   },
   computed: {
     ShowGoods() {
-      return this.goods[this.currenType].list;
+      return this.goods[this.currenType];
     },
-  },
-  destroyed() {
-    console.log("home destroyed");
   },
   activated() {
     this.$refs.scroll.scrollTo(0, this.saveY, 0);
@@ -104,6 +103,8 @@ export default {
   },
   deactivated() {
     this.saveY = this.$refs.scroll.getScrollY();
+    // 取消全局事件监听
+    this.$bus.$off("itemImageLoad", this.itemImgListener);
   },
   created() {
     // 请求多个数据
@@ -112,14 +113,6 @@ export default {
     this.getHomeGoods("pop");
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
-  },
-  mounted() {
-    // 图片加载完成的事件监听
-    const refresh = debounce(this.$refs.scroll.refresh, 50);
-    // 监听item中的图片加载完成
-    this.$bus.$on("itemImageLoad", () => {
-      refresh();
-    });
   },
   methods: {
     /**
@@ -138,11 +131,9 @@ export default {
           this.currenType = "sell";
           break;
       }
+      // 让两个 tabControl 保持一致
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
-    },
-    backClick() {
-      this.$refs.scroll.scrollTo(0, 0);
     },
     contenscroll(position) {
       // 判断 BackTop 是否显示
@@ -153,6 +144,7 @@ export default {
     loadMore() {
       //加载更多图片
       this.getHomeGoods(this.currenType);
+      this.$refs.scroll.refresh();
     },
     SwiperImageLoad() {
       this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
@@ -190,12 +182,6 @@ export default {
   .home-navbar {
     background-color: var(--color-tint);
     color: #fff;
-
-    // position: fixed;
-    // left: 0;
-    // right: 0;
-    // top: 0;
-    // z-index: 9;
   }
   .tab-control {
     position: relative;

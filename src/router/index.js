@@ -30,7 +30,7 @@ const routes = [{
     component: ProFile
   },
   {
-    path: '/detail',
+    path: '/detail/:iid',
     component: Detail
   }
 ]

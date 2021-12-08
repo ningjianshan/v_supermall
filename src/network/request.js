@@ -1,9 +1,9 @@
 import axios from 'axios'
 
-// export function request(config,success,failure){
-//     const install=axios.create({
-//         baseURL:'http://123.207.32.32:8000',
-//         timeOut:5000
+// export function request(config, success, failure) {
+//     const install = axios.create({
+//         baseURL: '192.168.255.10',
+//         timeOut: 8080
 //     });
 
 //     install(config)
